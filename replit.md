@@ -1,4 +1,4 @@
-# Beijing Brief - Daily Chinese Headlines Scanner
+# China Compass - Daily Chinese Headlines Scanner
 
 ## Overview
 A full-stack application that scans and analyzes Chinese news headlines from major newspapers. The app translates headlines to English, classifies them into 8 categories, and provides daily summary briefings.

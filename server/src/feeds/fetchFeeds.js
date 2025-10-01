@@ -3,7 +3,7 @@ import Parser from "rss-parser";
 const parser = new Parser({
   timeout: 20000,
   headers: {
-    "User-Agent": "BeijingBriefBot/0.1 (+https://example.com; polite; contact: admin@example.com)"
+    "User-Agent": "ChinaCompassBot/0.1 (+https://example.com; polite; contact: admin@example.com)"
   }
 });
 
