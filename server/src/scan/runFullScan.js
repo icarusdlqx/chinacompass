@@ -100,8 +100,7 @@ export async function runFullScan({ manual=false } = {}) {
     return { ...it, category: row?.category || "society" };
   });
   const byCat = groupBy(itemsWithCat, (x) => x.category);
-  for (const cat of Object.keys(byCat)) {
-    const list = byCat.get ? byCat.get(cat) : byCat[cat];
+  for (const [cat, list] of byCat.entries()) {
     // rank by source centrality then published time
     list.sort((a, b) => (a.source_id.includes("people") ? -1 : 0) - (b.source_id.includes("people") ? -1 : 0)
       || String(b.published_at || "").localeCompare(String(a.published_at || "")));
