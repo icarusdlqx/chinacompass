@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { config } from "./util/config.js";
@@ -46,8 +47,23 @@ app.get("/api/scans/:id", async (req, res) => {
 });
 
 // --- Static web build (optional) ---
-const webDist = path.resolve(__dirname, "../../web-dist");
-app.use("/", express.static(webDist));
+const webDist = path.resolve(__dirname, "../web-dist");
+const indexPath = path.join(webDist, "index.html");
+
+// Only serve static files if the build exists (production mode)
+if (fs.existsSync(indexPath)) {
+  app.use("/", express.static(webDist));
+  
+  // Catch-all route for SPA - serve index.html for all non-API routes
+  app.get(/^(?!\/api).*/, (req, res) => {
+    res.sendFile(indexPath);
+  });
+}
+
+// API 404 handler for unmatched API routes
+app.use("/api", (_req, res) => {
+  res.status(404).json({ error: "Not found" });
+});
 
 const port = Number(process.env.PORT || 8787);
 app.listen(port, () => {
