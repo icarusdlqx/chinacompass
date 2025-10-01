@@ -1,0 +1,20 @@
+{
+  "name": "beijing-brief-server",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --env-file=.env src/index.js",
+    "start": "node src/index.js",
+    "scan": "node --env-file=.env src/jobs/run-scan.js",
+    "build": "echo \"No server build step\""
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
+    "express": "^4.19.2",
+    "openai": "^4.58.2",
+    "rss-parser": "^3.13.0",
+    "better-sqlite3": "^9.6.0"
+  }
+}
