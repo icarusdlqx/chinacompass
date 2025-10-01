@@ -90,7 +90,7 @@ export async function classifyItems(model, items) {
   const resp = await openai.responses.create({
     model,
     input: JSON.stringify(input),
-    response_format: { type: "json_schema", json_schema: CLASSIFICATION_SCHEMA }
+    text: { format: "json_schema", schema: CLASSIFICATION_SCHEMA }
   });
   // Responses API: when using structured outputs, parse text or output[]
   const text = resp.output_text || (resp.output && resp.output[0] && resp.output[0].content && resp.output[0].content[0] && resp.output[0].content[0].text) || "{}";
@@ -105,7 +105,7 @@ export async function translateItems(model, items) {
   const resp = await openai.responses.create({
     model,
     input: JSON.stringify(input),
-    response_format: { type: "json_schema", json_schema: TRANSLATION_SCHEMA }
+    text: { format: "json_schema", schema: TRANSLATION_SCHEMA }
   });
   const text = resp.output_text || (resp.output && resp.output[0]?.content?.[0]?.text) || "{}";
   return JSON.parse(text);
@@ -126,7 +126,7 @@ export async function summarizeCategory(model, dateISO, category, items) {
   const resp = await openai.responses.create({
     model,
     input: JSON.stringify(input),
-    response_format: { type: "json_schema", json_schema: SUMMARY_SCHEMA }
+    text: { format: "json_schema", schema: SUMMARY_SCHEMA }
   });
   const text = resp.output_text || (resp.output && resp.output[0]?.content?.[0]?.text) || "{}";
   return JSON.parse(text);
