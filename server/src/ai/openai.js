@@ -5,7 +5,16 @@ import { config } from "../util/config.js";
 if (!config.OPENAI_API_KEY) {
   console.warn("[openai] OPENAI_API_KEY not set; AI features will fail.");
 }
-export const openai = new OpenAI({ apiKey: config.OPENAI_API_KEY });
+
+let _openai = null;
+function getOpenAI() {
+  if (!_openai) {
+    _openai = new OpenAI({ apiKey: config.OPENAI_API_KEY || 'dummy-key-for-dev' });
+  }
+  return _openai;
+}
+
+export const openai = getOpenAI();
 
 const CLASSIFICATION_SCHEMA = {
   name: "classification_schema",

@@ -8,7 +8,7 @@ export default defineConfig({
     port: 5000,
     allowedHosts: ['.replit.dev', '.replit.app', '.replit.co'],
     proxy: {
-      '/api': 'http://localhost:8787'
+      '/api': 'http://localhost:8000'
     }
   },
   build: {
