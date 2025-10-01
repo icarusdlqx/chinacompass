@@ -4,7 +4,10 @@ export default function Header({ onRescan, lastRun }: { onRescan: () => void, la
   return (
     <header className="sticky top-0 z-10 bg-white border-b">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
-        <h1 className="text-xl font-semibold tracking-tight">Beijing Brief</h1>
+        <div className="flex flex-col">
+          <h1 className="text-xl font-semibold tracking-tight">China Compass</h1>
+          <p className="text-xs text-gray-500">Daily Chinese headlines at a glance</p>
+        </div>
         <nav className="flex items-center gap-3 text-sm">
           <Link to="/" className="underline">Today</Link>
           <Link to="/log" className="underline">Log</Link>
