@@ -30,18 +30,14 @@ waitForPort = 5000
 outputType = "webview"
 
 [[ports]]
-localPort = 8000
-externalPort = 8000
-
-[[ports]]
-localPort = 35609
-externalPort = 80
-
-[[ports]]
 localPort = 5000
 externalPort = 80
 
+[[ports]]
+localPort = 8000
+externalPort = 8000
+
 [deployment]
 deploymentTarget = "autoscale"
-run = ["bash", "-c", "cd server && npm run start"]
-build = ["bash", "-c", "cd web && npm run build && mkdir -p ../server/web-dist && cp -r dist/* ../server/web-dist/"]
+run = ["npm", "run", "start"]
+build = ["npm", "run", "build"]

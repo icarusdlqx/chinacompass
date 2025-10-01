@@ -1,0 +1,12 @@
+{
+  "name": "beijing-brief",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "install": "cd server && npm install && cd ../web && npm install",
+    "build": "cd web && npm run build && mkdir -p ../server/web-dist && cp -r dist/* ../server/web-dist/",
+    "start": "cd server && npm run start",
+    "dev": "bash -c 'cd server && npm run dev & cd web && npm run dev'"
+  }
+}
