@@ -270,6 +270,7 @@ export async function classifyItems(model, items) {
   return requestStructuredCompletion({
     model,
     messages: [
+      { role: "user", content: "Respond strictly in JSON matching the schema." },
       { role: "user", content: JSON.stringify(input) }
     ],
     schemaDef: CLASSIFICATION_SCHEMA
@@ -284,6 +285,7 @@ export async function translateItems(model, items) {
   return requestStructuredCompletion({
     model,
     messages: [
+      { role: "user", content: "Respond strictly in JSON matching the schema." },
       { role: "user", content: JSON.stringify(input) }
     ],
     schemaDef: TRANSLATION_SCHEMA
@@ -306,6 +308,7 @@ export async function summarizeCategory(model, dateISO, category, items) {
     model,
     messages: [
       { role: "system", content: systemPrompt },
+      { role: "user", content: "Respond strictly in JSON matching the schema." },
       { role: "user", content: JSON.stringify(input) }
     ],
     schemaDef: SUMMARY_SCHEMA
