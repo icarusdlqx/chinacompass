@@ -1,14 +1,16 @@
 import { useMemo, useState } from 'react'
 
-type Item = {
+export type CategoryItem = {
   url: string
   source_name: string
   title_zh: string
   title_en?: string
   published_at?: string
+  rank_in_category?: number
+  salience_score?: number
 }
 
-export default function CategoryColumn({ title, items }: { title: string, items: Item[] }) {
+export default function CategoryColumn({ title, items }: { title: string, items: CategoryItem[] }) {
   const [showEnglish, setShowEnglish] = useState(false)
   const hasTranslations = useMemo(() => items.some(it => !!it.title_en), [items])
 
@@ -45,6 +47,8 @@ export default function CategoryColumn({ title, items }: { title: string, items:
         )}
         {items.map((it, idx) => {
           const time = formatTime(it.published_at)
+          const rankLabel = typeof it.rank_in_category === 'number' ? `#${it.rank_in_category}` : null
+          const scoreLabel = typeof it.salience_score === 'number' ? Math.round(it.salience_score) : null
           return (
             <li key={it.url + idx} className="group">
               <a
@@ -54,10 +58,20 @@ export default function CategoryColumn({ title, items }: { title: string, items:
                 className="block rounded-2xl border border-transparent px-4 py-3 transition hover:border-slate-200 hover:bg-slate-50"
               >
                 <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                  {rankLabel && (
+                    <span className="inline-flex items-center rounded-full bg-indigo-100 px-2 py-0.5 font-semibold text-indigo-700">
+                      {rankLabel}
+                    </span>
+                  )}
                   <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-700">
                     {it.source_name}
                   </span>
                   {time && <time className="font-medium text-slate-600">{time}</time>}
+                  {scoreLabel !== null && (
+                    <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 font-medium text-amber-700">
+                      Score: {scoreLabel}
+                    </span>
+                  )}
                 </div>
                 <p className="mt-2 text-sm font-medium leading-snug text-slate-900 group-hover:text-slate-950">
                   {it.title_zh}

@@ -5,8 +5,8 @@ import { db } from "../util/db.js";
 import { config } from "../util/config.js";
 import { getAllSources, getEnabledSources } from "../feeds/registry.js";
 import { fetchFeed } from "../feeds/fetchFeeds.js";
-import { articleIdFrom, normalizeTitle, groupBy, CATEGORY_ORDER } from "./helpers.js";
-import { classifyItems, translateItems, summarizeCategory, hashStable } from "../ai/openai.js";
+import { articleIdFrom, normalizeTitle, groupBy } from "./helpers.js";
+import { classifyItems, translateItems, summarizeCategory, hashStable, rankItems } from "../ai/openai.js";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -74,6 +74,7 @@ export async function runFullScan({ manual=false } = {}) {
   }
   for (const it of items) {
     const cat = catByUrl.get(it.url) || { category: "society", confidence: 0.4 };
+    it.category = cat.category;
     db.prepare(`INSERT OR REPLACE INTO classifications (article_id, category, confidence, method, created_at)
                 VALUES (?, ?, ?, ?, ?)`)
       .run(it.id, cat.category, cat.confidence, "openai_structured", startedAt);
@@ -91,31 +92,52 @@ export async function runFullScan({ manual=false } = {}) {
       db.prepare(`INSERT OR REPLACE INTO translations (article_id, title_en, dek_en, engine, created_at)
                   VALUES (?, ?, ?, ?, ?)`)
         .run(it.id, tr.title_en, tr.dek_en, "openai", startedAt);
+      it.title_en = tr.title_en;
+      it.dek_en = tr.dek_en;
     }
   }
 
-  // 6) Build scan_items ranked per category
-  const itemsWithCat = items.map(it => {
-    const row = db.prepare("SELECT category FROM classifications WHERE article_id = ?").get(it.id);
-    return { ...it, category: row?.category || "society" };
-  });
+  // 6) Salience ranking per category
+  const rankingPayload = items.map(it => ({
+    article_id: it.id,
+    url: it.url,
+    category: it.category || "society",
+    title_zh: it.title_zh,
+    title_en: it.title_en || "",
+    source_name: it.source_name,
+    section_hint: it.section_hint,
+    published_at: it.published_at
+  }));
+  const ranking = await rankItems(config.OPENAI_MODEL, rankingPayload);
+  const scoreByArticle = new Map();
+  for (const row of (ranking.items || [])) {
+    const score = Number(row.salience_score);
+    if (!Number.isNaN(score)) {
+      scoreByArticle.set(row.article_id, score);
+    }
+  }
+
+  // 7) Build scan_items ranked per category using salience scores
+  const itemsWithCat = items.map(it => ({ ...it, salience_score: scoreByArticle.get(it.id) }));
   const byCat = groupBy(itemsWithCat, (x) => x.category);
   for (const [cat, list] of byCat.entries()) {
-    // rank by source centrality then published time
-    list.sort((a, b) => (a.source_id.includes("people") ? -1 : 0) - (b.source_id.includes("people") ? -1 : 0)
+    // rank by AI salience score, then fall back to publication time
+    list.sort((a, b) => (scoreByArticle.get(b.id) ?? 0) - (scoreByArticle.get(a.id) ?? 0)
       || String(b.published_at || "").localeCompare(String(a.published_at || "")));
+    const top = list.slice(0, 25);
     let rank = 1;
-    for (const it of list) {
-      db.prepare(`INSERT OR REPLACE INTO scan_items (scan_id, article_id, category, rank_in_category, is_duplicate, cluster_id)
-                  VALUES (?, ?, ?, ?, 0, NULL)`)
-        .run(scanId, it.id, cat, rank++);
+    for (const it of top) {
+      const score = scoreByArticle.get(it.id);
+      db.prepare(`INSERT OR REPLACE INTO scan_items (scan_id, article_id, category, rank_in_category, salience_score, is_duplicate, cluster_id)
+                  VALUES (?, ?, ?, ?, ?, 0, NULL)`)
+        .run(scanId, it.id, cat, rank++, score ?? null);
     }
   }
 
-  // 7) Summaries per category
+  // 8) Summaries per category
   for (const category of ["international","domestic_politics","business","society","technology","military","science","opinion"]) {
     const rows = db.prepare(`
-      SELECT a.*, s.name as source_name, t.title_en
+      SELECT a.*, s.name as source_name, t.title_en, si.salience_score
       FROM scan_items si
       JOIN articles a ON a.id = si.article_id
       JOIN sources s ON s.id = a.source_id

@@ -65,6 +65,28 @@ const TRANSLATION_SCHEMA = {
   strict: true
 };
 
+const RANKING_SCHEMA = {
+  name: "ranking_schema",
+  schema: {
+    type: "object",
+    properties: {
+      items: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            article_id: { type: "string" },
+            salience_score: { type: "number", minimum: 0, maximum: 100 }
+          },
+          required: ["article_id", "salience_score"]
+        }
+      }
+    },
+    required: ["items"]
+  },
+  strict: true
+};
+
 const SUMMARY_SCHEMA = {
   name: "summary_schema",
   schema: {
@@ -106,6 +128,31 @@ export async function translateItems(model, items) {
     model,
     input: JSON.stringify(input),
     text: { format: "json_schema", schema: TRANSLATION_SCHEMA }
+  });
+  const text = resp.output_text || (resp.output && resp.output[0]?.content?.[0]?.text) || "{}";
+  return JSON.parse(text);
+}
+
+export async function rankItems(model, items) {
+  if (!items.length) return { items: [] };
+  const input = {
+    task: "Score each Chinese news article's salience within its assigned category (0-100). Higher scores reflect greater prominence, central policy relevance, or widespread public attention.",
+    guidance: "Use the source reputation, section hints, and timing to inform the salience judgment. Output only the score per article; do not reorder or omit entries.",
+    items: items.map(i => ({
+      article_id: i.article_id,
+      url: i.url,
+      category: i.category,
+      title_zh: i.title_zh,
+      title_en: i.title_en || "",
+      source_name: i.source_name || "",
+      section_hint: i.section_hint || "",
+      published_at: i.published_at || ""
+    }))
+  };
+  const resp = await openai.responses.create({
+    model,
+    input: JSON.stringify(input),
+    text: { format: "json_schema", schema: RANKING_SCHEMA }
   });
   const text = resp.output_text || (resp.output && resp.output[0]?.content?.[0]?.text) || "{}";
   return JSON.parse(text);

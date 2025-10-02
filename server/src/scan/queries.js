@@ -15,7 +15,7 @@ export function getScanById(id) {
   const scan = db.prepare("SELECT * FROM scans WHERE id = ?").get(id);
   if (!scan) return null;
   const items = db.prepare(`
-    SELECT a.*, s.name as source_name, si.category, si.rank_in_category, si.is_duplicate
+    SELECT a.*, s.name as source_name, si.category, si.rank_in_category, si.salience_score, si.is_duplicate
     FROM scan_items si
     JOIN articles a ON a.id = si.article_id
     JOIN sources s ON s.id = a.source_id

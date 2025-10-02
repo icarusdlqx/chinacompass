@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import Header from '../components/Header'
-import CategoryColumn from '../components/CategoryColumn'
+import CategoryColumn, { CategoryItem } from '../components/CategoryColumn'
 import SummaryCard from '../components/SummaryCard'
 
 type ScanPayload = {
   meta: { id: string, run_started_at: string }
-  categories: Record<string, any[]>
+  categories: Record<string, CategoryItem[]>
   summaries: Record<string, any>
 }
 
@@ -89,8 +89,9 @@ export default function Today() {
             )}
 
             <section className="mt-8 space-y-6" aria-label="Category coverage">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                 <h2 className="text-lg font-semibold text-slate-900">Category coverage</h2>
+                <p className="text-sm text-slate-500">Top 25 AI-ranked items per category</p>
               </div>
               <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {order.map(c => (

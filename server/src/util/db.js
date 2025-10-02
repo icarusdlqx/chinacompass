@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS scan_items (
   article_id TEXT NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
   category TEXT,
   rank_in_category INTEGER,
+  salience_score REAL,
   is_duplicate INTEGER DEFAULT 0,
   cluster_id TEXT,
   PRIMARY KEY (scan_id, article_id)
@@ -75,3 +76,8 @@ CREATE TABLE IF NOT EXISTS summaries (
   PRIMARY KEY (scan_id, category)
 );
 `);
+
+const scanItemColumns = db.prepare("PRAGMA table_info(scan_items)").all();
+if (!scanItemColumns.some(col => col.name === "salience_score")) {
+  db.exec("ALTER TABLE scan_items ADD COLUMN salience_score REAL");
+}
