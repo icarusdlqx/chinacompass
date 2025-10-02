@@ -281,7 +281,7 @@ export async function classifyItems(model, items) {
 export async function translateItems(model, items) {
   const input = {
     task: "Translate the Chinese headlines to English concisely. Preserve named entities, institutions, policy terms; do not anglicize official names (e.g., keep 'NDRC', 'CCP', 'PLA'). Provide plain text. If a subtitle/dek is present, translate it too.",
-    items: items.map(i => ({ url: i.url, title_zh: i.title_zh, dek_zh: i.dek_zh || "" }))
+    items: items.map(i => ({ url: i.url, title_zh: i.title_zh }))
   };
   const prompt = `Respond strictly in JSON matching the schema.\n\n${JSON.stringify(input)}`;
   return requestStructuredCompletion({
