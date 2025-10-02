@@ -3,7 +3,7 @@ import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
 import { db } from "../util/db.js";
 import { config } from "../util/config.js";
-import { SOURCE_REGISTRY } from "../feeds/registry.js";
+import { getAllSources, getEnabledSources } from "../feeds/registry.js";
 import { fetchFeed } from "../feeds/fetchFeeds.js";
 import { articleIdFrom, normalizeTitle, groupBy, CATEGORY_ORDER } from "./helpers.js";
 import { classifyItems, translateItems, summarizeCategory, hashStable } from "../ai/openai.js";
@@ -19,14 +19,14 @@ export async function runFullScan({ manual=false } = {}) {
     .run(scanId, startedAt, manual ? "manual" : "scheduled", config.TZ);
 
   // Ensure sources table is seeded
-  for (const s of SOURCE_REGISTRY) {
+  for (const s of getAllSources()) {
     db.prepare(`INSERT OR IGNORE INTO sources (id, name, region, tier, homepage_url, enabled)
                 VALUES (@id, @name, @region, @tier, @homepage_url, 1)`).run(s);
   }
 
   // 1) Fetch feeds
   const rawItems = [];
-  for (const src of SOURCE_REGISTRY.filter(s => s.enabled !== 0)) {
+  for (const src of getEnabledSources()) {
     for (const feed of (src.feeds || [])) {
       const items = await fetchFeed(feed.url);
       for (const it of items) {
