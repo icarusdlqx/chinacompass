@@ -267,11 +267,11 @@ export async function classifyItems(model, items) {
     categories: ["international","domestic_politics","business","society","technology","military","science","opinion"],
     items: items.map(i => ({ url: i.url, title_zh: i.title_zh, section_hint: i.section_hint || "" }))
   };
+  const prompt = `Respond strictly in JSON matching the schema.\n\n${JSON.stringify(input)}`;
   return requestStructuredCompletion({
     model,
     messages: [
-      { role: "user", content: "Respond strictly in JSON matching the schema." },
-      { role: "user", content: JSON.stringify(input) }
+      { role: "user", content: prompt }
     ],
     schemaDef: CLASSIFICATION_SCHEMA
   });
@@ -282,11 +282,11 @@ export async function translateItems(model, items) {
     task: "Translate the Chinese headlines to English concisely. Preserve named entities, institutions, policy terms; do not anglicize official names (e.g., keep 'NDRC', 'CCP', 'PLA'). Provide plain text. If a subtitle/dek is present, translate it too.",
     items: items.map(i => ({ url: i.url, title_zh: i.title_zh, dek_zh: i.dek_zh || "" }))
   };
+  const prompt = `Respond strictly in JSON matching the schema.\n\n${JSON.stringify(input)}`;
   return requestStructuredCompletion({
     model,
     messages: [
-      { role: "user", content: "Respond strictly in JSON matching the schema." },
-      { role: "user", content: JSON.stringify(input) }
+      { role: "user", content: prompt }
     ],
     schemaDef: TRANSLATION_SCHEMA
   });
@@ -304,12 +304,12 @@ export async function summarizeCategory(model, dateISO, category, items) {
       url: i.url
     }))
   };
+  const prompt = `Respond strictly in JSON matching the schema.\n\n${JSON.stringify(input)}`;
   return requestStructuredCompletion({
     model,
     messages: [
       { role: "system", content: systemPrompt },
-      { role: "user", content: "Respond strictly in JSON matching the schema." },
-      { role: "user", content: JSON.stringify(input) }
+      { role: "user", content: prompt }
     ],
     schemaDef: SUMMARY_SCHEMA
   });
