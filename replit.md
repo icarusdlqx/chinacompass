@@ -25,26 +25,27 @@ A full-stack application that scans and analyzes Chinese news headlines from maj
   - Historical scan log
   - Category-based article organization
 
-## Setup Notes (October 1, 2025)
+## Setup Notes (October 2, 2025)
 
 ### Configuration Changes for Replit
-1. **Backend Port**: Changed from 8787 to 8000 (Replit allowed port)
-2. **Frontend Configuration**:
+1. **Backend Port**: Changed from 8787 to 8000 to match Vite proxy configuration
+2. **Backend Host**: Configured to bind to localhost only (security best practice)
+3. **Frontend Configuration**:
    - Host: 0.0.0.0 (required for Replit proxy)
    - Port: 5000
-   - AllowedHosts: ['.replit.dev', '.replit.app', '.replit.co']
+   - HMR clientPort: 443 (for Replit environment)
    - Proxy: API requests to localhost:8000
-3. **OpenAI Integration**: Made graceful with dummy key fallback for development
+4. **Dependencies**: Installed via npm for both server and web directories
 
 ### Environment Variables
 Located in `/server/.env`:
 - `PORT`: 8000
 - `TZ`: Asia/Shanghai
 - `DB_FILE`: ./data/app.db
-- `OPENAI_API_KEY`: (required for AI features)
+- `OPENAI_API_KEY`: (required for AI features - currently empty)
 - `OPENAI_MODEL`: gpt-4o-mini
 - `USE_EMBEDDINGS`: false
-- `ADMIN_TOKEN`: replit-dev-token
+- `ADMIN_TOKEN`: (required for /api/scan endpoint - currently empty)
 
 ### Workflows
 - **Frontend**: Runs both backend and frontend servers
