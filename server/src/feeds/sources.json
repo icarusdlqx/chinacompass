@@ -17,7 +17,11 @@
     "tier": "municipal",
     "homepage_url": "https://www.bjd.com.cn/",
     "feeds": [
-      { "name": "main", "url": "https://rss2.bjd.com.cn/", "section_hint": "domestic_politics" }
+      {
+        "name": "beijing_news",
+        "url": "https://rss2.bjd.com.cn/rss/bjd_all.xml",
+        "section_hint": "domestic_politics"
+      }
     ]
   },
   {
@@ -27,7 +31,11 @@
     "tier": "central",
     "homepage_url": "https://www.ce.cn/",
     "feeds": [
-      { "name": "rss", "url": "https://rss.jingjiribao.cn/", "section_hint": "business" }
+      {
+        "name": "economy",
+        "url": "https://rss.jingjiribao.cn/rss/jingji.xml",
+        "section_hint": "business"
+      }
     ]
   },
   {
@@ -37,7 +45,11 @@
     "tier": "regional",
     "homepage_url": "https://news.mingpao.com/",
     "feeds": [
-      { "name": "all", "url": "https://news.mingpao.com/php/rss.php", "section_hint": "mixed" }
+      {
+        "name": "instant",
+        "url": "https://news.mingpao.com/rss/ins/s00001.xml",
+        "section_hint": "mixed"
+      }
     ]
   },
   {
@@ -47,7 +59,11 @@
     "tier": "regional",
     "homepage_url": "https://www.hket.com/",
     "feeds": [
-      { "name": "rss_index", "url": "https://www.hket.com/rss", "section_hint": "business" }
+      {
+        "name": "finance",
+        "url": "https://www.hket.com/rss/s20001.xml",
+        "section_hint": "business"
+      }
     ]
   },
   {
@@ -57,7 +73,11 @@
     "tier": "regional",
     "homepage_url": "https://www.ltn.com.tw/",
     "feeds": [
-      { "name": "rss_index", "url": "https://service.ltn.com.tw/RSS", "section_hint": "mixed" }
+      {
+        "name": "politics",
+        "url": "https://news.ltn.com.tw/rss/politics.xml",
+        "section_hint": "domestic_politics"
+      }
     ]
   }
 ]
