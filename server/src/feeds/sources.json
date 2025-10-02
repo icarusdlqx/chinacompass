@@ -8,7 +8,7 @@
     "feeds": [
       {
         "name": "front_page",
-        "url": "http://www.people.com.cn/rss/index.xml",
+        "url": "https://www.people.com.cn/rss/index.xml",
         "section_hint": "mixed"
       }
     ]
@@ -64,7 +64,7 @@
     "feeds": [
       {
         "name": "front_page",
-        "url": "https://www.globaltimes.cn/rss/topnews.xml",
+        "url": "https://www.globaltimes.cn/rss/index.xml",
         "section_hint": "mixed"
       }
     ]
