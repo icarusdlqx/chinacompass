@@ -7,9 +7,9 @@
     "homepage_url": "https://www.people.com.cn",
     "feeds": [
       {
-        "name": "politics",
-        "url": "http://www.people.com.cn/rss/politics.xml",
-        "section_hint": "domestic_politics"
+        "name": "front_page",
+        "url": "http://www.people.com.cn/rss/index.xml",
+        "section_hint": "mixed"
       }
     ]
   },
@@ -21,9 +21,9 @@
     "homepage_url": "https://www.cankaoxiaoxi.com",
     "feeds": [
       {
-        "name": "world",
-        "url": "https://www.cankaoxiaoxi.com/rss/world.xml",
-        "section_hint": "international"
+        "name": "front_page",
+        "url": "https://www.cankaoxiaoxi.com/rss/index.xml",
+        "section_hint": "mixed"
       }
     ]
   },
@@ -49,9 +49,9 @@
     "homepage_url": "https://www.ce.cn/",
     "feeds": [
       {
-        "name": "economy",
-        "url": "https://rss.jingjiribao.cn/rss/jingji.xml",
-        "section_hint": "business"
+        "name": "front_page",
+        "url": "https://rss.jingjiribao.cn/rss/index.xml",
+        "section_hint": "mixed"
       }
     ]
   },
@@ -63,9 +63,9 @@
     "homepage_url": "https://www.globaltimes.cn",
     "feeds": [
       {
-        "name": "china",
-        "url": "https://www.globaltimes.cn/rss/china.xml",
-        "section_hint": "domestic_politics"
+        "name": "front_page",
+        "url": "https://www.globaltimes.cn/rss/topnews.xml",
+        "section_hint": "mixed"
       }
     ]
   },
@@ -105,9 +105,9 @@
     "homepage_url": "https://www.zaobao.com.sg",
     "feeds": [
       {
-        "name": "china",
-        "url": "https://www.zaobao.com.sg/rss/world/china",
-        "section_hint": "international"
+        "name": "front_page",
+        "url": "https://www.zaobao.com.sg/rss.xml",
+        "section_hint": "mixed"
       }
     ]
   },
@@ -119,9 +119,9 @@
     "homepage_url": "https://www.caixin.com",
     "feeds": [
       {
-        "name": "china",
-        "url": "https://rss.caixin.com/rss/china.xml",
-        "section_hint": "business"
+        "name": "front_page",
+        "url": "https://rss.caixin.com/rss/index.xml",
+        "section_hint": "mixed"
       }
     ]
   }
