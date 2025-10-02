@@ -71,8 +71,8 @@ app.use("/api", (_req, res) => {
   res.status(404).json({ error: "Not found" });
 });
 
-const port = Number(process.env.PORT || 8787);
-app.listen(port, () => {
+const port = Number(process.env.PORT || 8000);
+app.listen(port, "localhost", () => {
   console.log(`[server] listening on http://localhost:${port}`);
   db.pragma("journal_mode = WAL");
 });

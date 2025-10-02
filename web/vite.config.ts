@@ -6,7 +6,9 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5000,
-    allowedHosts: ['.replit.dev', '.replit.app', '.replit.co'],
+    hmr: {
+      clientPort: 443
+    },
     proxy: {
       '/api': 'http://localhost:8000'
     }

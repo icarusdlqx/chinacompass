@@ -1,5 +1,5 @@
 export const config = {
-  PORT: Number(process.env.PORT || 8787),
+  PORT: Number(process.env.PORT || 8000),
   TZ: process.env.TZ || "Asia/Shanghai",
   DB_FILE: process.env.DB_FILE || "./data/app.db",
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
