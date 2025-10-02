@@ -15,6 +15,7 @@ const OPENAI_SOURCE_ID = "__openai__";
 const MAX_ERROR_LENGTH = 500;
 const MAX_TITLE_CHARS = 512;
 const MAX_DEK_CHARS = 1200;
+const MAX_FEED_ITEMS = 100;
 
 function truncateField(value, maxLength) {
   if (!value) return "";
@@ -109,7 +110,10 @@ export async function runFullScan({ manual=false } = {}) {
       let lastError = null;
       for (const feed of (src.feeds || [])) {
         try {
-          const feedItems = (await fetchFeed(feed.url)).slice(0, 100);
+          const fetchedItems = await fetchFeed(feed.url);
+          const feedItems = Array.isArray(fetchedItems)
+            ? fetchedItems.slice(0, MAX_FEED_ITEMS)
+            : [];
           totalForSource += feedItems.length;
           for (const it of feedItems) {
             const url = it.link || it.guid || "";
