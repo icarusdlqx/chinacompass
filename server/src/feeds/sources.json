@@ -6,21 +6,38 @@
     "tier": "central",
     "homepage_url": "https://www.people.com.cn",
     "feeds": [
-      { "name": "politics", "url": "http://www.people.com.cn/rss/politics.xml", "section_hint": "domestic_politics" },
-      { "name": "society", "url": "http://www.people.com.cn/rss/society.xml", "section_hint": "society" }
+      {
+        "name": "politics",
+        "url": "http://www.people.com.cn/rss/politics.xml",
+        "section_hint": "domestic_politics"
+      }
     ]
   },
   {
-    "id": "beijing_daily",
-    "name": "北京日报 / Beijing Daily",
-    "region": "Beijing",
-    "tier": "municipal",
-    "homepage_url": "https://www.bjd.com.cn/",
+    "id": "reference_news",
+    "name": "参考消息 / Reference News",
+    "region": "Mainland",
+    "tier": "central",
+    "homepage_url": "https://www.cankaoxiaoxi.com",
     "feeds": [
       {
-        "name": "beijing_news",
-        "url": "https://rss2.bjd.com.cn/rss/bjd_all.xml",
-        "section_hint": "domestic_politics"
+        "name": "world",
+        "url": "https://www.cankaoxiaoxi.com/rss/world.xml",
+        "section_hint": "international"
+      }
+    ]
+  },
+  {
+    "id": "guangming_daily",
+    "name": "光明日报 / Guangming Daily",
+    "region": "Mainland",
+    "tier": "central",
+    "homepage_url": "https://www.gmw.cn",
+    "feeds": [
+      {
+        "name": "top_news",
+        "url": "https://rss.gmw.cn/news.xml",
+        "section_hint": "mixed"
       }
     ]
   },
@@ -39,44 +56,72 @@
     ]
   },
   {
-    "id": "ming_pao",
-    "name": "明报 / Ming Pao (HK)",
-    "region": "Hong Kong",
-    "tier": "regional",
-    "homepage_url": "https://news.mingpao.com/",
+    "id": "global_times",
+    "name": "环球时报 / Global Times",
+    "region": "Mainland",
+    "tier": "central",
+    "homepage_url": "https://www.globaltimes.cn",
     "feeds": [
       {
-        "name": "instant",
-        "url": "https://news.mingpao.com/rss/ins/s00001.xml",
-        "section_hint": "mixed"
-      }
-    ]
-  },
-  {
-    "id": "hket",
-    "name": "香港经济日报 / HKET",
-    "region": "Hong Kong",
-    "tier": "regional",
-    "homepage_url": "https://www.hket.com/",
-    "feeds": [
-      {
-        "name": "finance",
-        "url": "https://www.hket.com/rss/s20001.xml",
-        "section_hint": "business"
-      }
-    ]
-  },
-  {
-    "id": "ltn",
-    "name": "自由时报 / Liberty Times (TW)",
-    "region": "Taiwan",
-    "tier": "regional",
-    "homepage_url": "https://www.ltn.com.tw/",
-    "feeds": [
-      {
-        "name": "politics",
-        "url": "https://news.ltn.com.tw/rss/politics.xml",
+        "name": "china",
+        "url": "https://www.globaltimes.cn/rss/china.xml",
         "section_hint": "domestic_politics"
+      }
+    ]
+  },
+  {
+    "id": "beijing_daily",
+    "name": "北京日报 / Beijing Daily",
+    "region": "Beijing",
+    "tier": "municipal",
+    "homepage_url": "https://www.bjd.com.cn",
+    "feeds": [
+      {
+        "name": "beijing_news",
+        "url": "https://rss2.bjd.com.cn/rss/bjd_all.xml",
+        "section_hint": "local"
+      }
+    ]
+  },
+  {
+    "id": "beijing_news",
+    "name": "新京报 / The Beijing News",
+    "region": "Beijing",
+    "tier": "municipal",
+    "homepage_url": "https://www.bjnews.com.cn",
+    "feeds": [
+      {
+        "name": "latest",
+        "url": "https://www.bjnews.com.cn/rss.xml",
+        "section_hint": "local"
+      }
+    ]
+  },
+  {
+    "id": "lianhe_zaobao",
+    "name": "联合早报 / Lianhe Zaobao",
+    "region": "Singapore",
+    "tier": "international",
+    "homepage_url": "https://www.zaobao.com.sg",
+    "feeds": [
+      {
+        "name": "china",
+        "url": "https://www.zaobao.com.sg/rss/world/china",
+        "section_hint": "international"
+      }
+    ]
+  },
+  {
+    "id": "caixin",
+    "name": "财新 / Caixin",
+    "region": "Mainland",
+    "tier": "national",
+    "homepage_url": "https://www.caixin.com",
+    "feeds": [
+      {
+        "name": "china",
+        "url": "https://rss.caixin.com/rss/china.xml",
+        "section_hint": "business"
       }
     ]
   }
