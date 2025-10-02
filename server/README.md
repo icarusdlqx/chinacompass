@@ -10,6 +10,10 @@ Copy `.env.example` to `.env` and set your values. The default DB is SQLite at `
 ## Legal & Robots
 Prefer official RSS feeds and respect each site’s Terms of Service and robots.txt. Throttle requests and cache feeds.
 
+## Feeds registry
+- Edit `src/feeds/sources.json` to add, update, or remove outlets. Each source entry must include an `id`, human-readable `name`, `homepage_url`, and at least one feed with a `url`. Optional fields such as `region`, `tier`, and `section_hint` help downstream categorisation but are not required.
+- No code changes are necessary after updating the JSON. The registry loader validates the file on startup and populates the database automatically during scans.
+
 ## API
 - `POST /api/scan` (auth: Bearer `ADMIN_TOKEN`) – run full scan now.
 - `GET /api/today` – latest scan.
