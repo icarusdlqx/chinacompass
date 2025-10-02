@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Header from '../components/Header'
 import CategoryColumn from '../components/CategoryColumn'
 import SummaryCard from '../components/SummaryCard'
+import StatusBar from '../components/StatusBar'
 
 type ScanPayload = {
   meta: { id: string, run_started_at: string }
@@ -56,7 +57,7 @@ export default function Today() {
   return (
     <div className="min-h-screen bg-slate-50">
       <Header onRescan={rescan} lastRun={data?.meta.run_started_at} />
-      <main className="max-w-7xl mx-auto px-4 pb-10">
+      <main className="max-w-7xl mx-auto px-4 pb-28">
         {error && <div className="p-3 border rounded bg-yellow-50 text-sm">{error}</div>}
         {!data ? <div className="mt-10 text-center text-sm text-slate-600">Loading…</div> : (
           <>
@@ -112,6 +113,7 @@ export default function Today() {
           </>
         )}
       </main>
+      <StatusBar />
     </div>
   )
 }

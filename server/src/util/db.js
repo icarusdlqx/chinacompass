@@ -54,7 +54,8 @@ CREATE TABLE IF NOT EXISTS scans (
   run_completed_at TEXT,
   schedule_kind TEXT,
   timezone TEXT,
-  total_articles INTEGER
+  total_articles INTEGER,
+  status TEXT DEFAULT 'pending'
 );
 
 CREATE TABLE IF NOT EXISTS scan_items (
@@ -74,4 +75,27 @@ CREATE TABLE IF NOT EXISTS summaries (
   created_at TEXT NOT NULL,
   PRIMARY KEY (scan_id, category)
 );
+
+CREATE TABLE IF NOT EXISTS scan_source_statuses (
+  scan_id TEXT NOT NULL REFERENCES scans(id) ON DELETE CASCADE,
+  source_id TEXT NOT NULL,
+  fetch_started_at TEXT,
+  fetch_completed_at TEXT,
+  fetch_status TEXT NOT NULL DEFAULT 'pending',
+  article_count INTEGER DEFAULT 0,
+  error_message TEXT,
+  classification_status TEXT,
+  translation_status TEXT,
+  summarization_status TEXT,
+  openai_connected INTEGER,
+  openai_error TEXT,
+  last_updated_at TEXT NOT NULL,
+  PRIMARY KEY (scan_id, source_id)
+);
 `);
+
+const scanColumns = db.prepare("PRAGMA table_info(scans)").all();
+if (!scanColumns.some(col => col.name === "status")) {
+  db.exec("ALTER TABLE scans ADD COLUMN status TEXT DEFAULT 'pending'");
+}
+db.exec("UPDATE scans SET status = CASE WHEN run_completed_at IS NOT NULL THEN 'complete' ELSE COALESCE(status, 'pending') END WHERE status IS NULL");
