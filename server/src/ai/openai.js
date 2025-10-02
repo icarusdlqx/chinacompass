@@ -87,13 +87,17 @@ export async function classifyItems(model, items) {
     categories: ["international","domestic_politics","business","society","technology","military","science","opinion"],
     items: items.map(i => ({ url: i.url, title_zh: i.title_zh, section_hint: i.section_hint || "" }))
   };
-  const resp = await openai.responses.create({
+  const resp = await openai.chat.completions.create({
     model,
-    input: JSON.stringify(input),
-    text: { format: "json_schema", schema: CLASSIFICATION_SCHEMA }
+    messages: [
+      { role: "user", content: JSON.stringify(input) }
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: CLASSIFICATION_SCHEMA
+    }
   });
-  // Responses API: when using structured outputs, parse text or output[]
-  const text = resp.output_text || (resp.output && resp.output[0] && resp.output[0].content && resp.output[0].content[0] && resp.output[0].content[0].text) || "{}";
+  const text = resp.choices[0]?.message?.content || "{}";
   return JSON.parse(text);
 }
 
@@ -102,18 +106,23 @@ export async function translateItems(model, items) {
     task: "Translate the Chinese headlines to English concisely. Preserve named entities, institutions, policy terms; do not anglicize official names (e.g., keep 'NDRC', 'CCP', 'PLA'). Provide plain text. If a subtitle/dek is present, translate it too.",
     items: items.map(i => ({ url: i.url, title_zh: i.title_zh, dek_zh: i.dek_zh || "" }))
   };
-  const resp = await openai.responses.create({
+  const resp = await openai.chat.completions.create({
     model,
-    input: JSON.stringify(input),
-    text: { format: "json_schema", schema: TRANSLATION_SCHEMA }
+    messages: [
+      { role: "user", content: JSON.stringify(input) }
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: TRANSLATION_SCHEMA
+    }
   });
-  const text = resp.output_text || (resp.output && resp.output[0]?.content?.[0]?.text) || "{}";
+  const text = resp.choices[0]?.message?.content || "{}";
   return JSON.parse(text);
 }
 
 export async function summarizeCategory(model, dateISO, category, items) {
+  const systemPrompt = "You are compiling a diplomatic morning brief. Compare narratives across outlets; highlight policy signals, euphemisms, and divergences. Neutral tone.";
   const input = {
-    role: "You are compiling a diplomatic morning brief. Compare narratives across outlets; highlight policy signals, euphemisms, and divergences. Neutral tone.",
     date: dateISO,
     category,
     items: items.map(i => ({
@@ -123,12 +132,18 @@ export async function summarizeCategory(model, dateISO, category, items) {
       url: i.url
     }))
   };
-  const resp = await openai.responses.create({
+  const resp = await openai.chat.completions.create({
     model,
-    input: JSON.stringify(input),
-    text: { format: "json_schema", schema: SUMMARY_SCHEMA }
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: JSON.stringify(input) }
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: SUMMARY_SCHEMA
+    }
   });
-  const text = resp.output_text || (resp.output && resp.output[0]?.content?.[0]?.text) || "{}";
+  const text = resp.choices[0]?.message?.content || "{}";
   return JSON.parse(text);
 }
 
