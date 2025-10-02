@@ -64,10 +64,8 @@ function validateClassification(data) {
     if (!allowedCategories.includes(item.category)) {
       throw new Error(`[openai] Classification item #${idx} category must be one of ${allowedCategories.join(", ")}.`);
     }
-    if ("confidence" in item) {
-      if (typeof item.confidence !== "number" || Number.isNaN(item.confidence) || item.confidence < 0 || item.confidence > 1) {
-        throw new Error(`[openai] Classification item #${idx} confidence must be a number between 0 and 1.`);
-      }
+    if (typeof item.confidence !== "number" || Number.isNaN(item.confidence) || item.confidence < 0 || item.confidence > 1) {
+      throw new Error(`[openai] Classification item #${idx} confidence must be a number between 0 and 1.`);
     }
   });
   return data;
@@ -88,8 +86,8 @@ function validateTranslation(data) {
     if (!isNonEmptyString(item.title_en)) {
       throw new Error(`[openai] Translation item #${idx} title_en must be a non-empty string.`);
     }
-    if ("dek_en" in item && typeof item.dek_en !== "string") {
-      throw new Error(`[openai] Translation item #${idx} dek_en must be a string when provided.`);
+    if (typeof item.dek_en !== "string") {
+      throw new Error(`[openai] Translation item #${idx} dek_en must be a string.`);
     }
   });
   return data;
@@ -111,16 +109,14 @@ function validateSummary(data) {
   ];
 
   arrayFields.forEach(field => {
-    if (field in data && !Array.isArray(data[field])) {
-      throw new Error(`[openai] Summary field ${field} must be an array when provided.`);
+    if (!Array.isArray(data[field])) {
+      throw new Error(`[openai] Summary field ${field} must be an array.`);
     }
-    if (Array.isArray(data[field])) {
-      data[field].forEach((entry, idx) => {
-        if (!isNonEmptyString(entry)) {
-          throw new Error(`[openai] Summary field ${field} entry #${idx} must be a non-empty string.`);
-        }
-      });
-    }
+    data[field].forEach((entry, idx) => {
+      if (!isNonEmptyString(entry)) {
+        throw new Error(`[openai] Summary field ${field} entry #${idx} must be a non-empty string.`);
+      }
+    });
   });
 
   return data;
@@ -215,7 +211,7 @@ const CLASSIFICATION_SCHEMA = {
             },
             confidence: { type: "number", minimum: 0, maximum: 1 }
           },
-          required: ["url","category"]
+          required: ["url","category","confidence"]
         }
       }
     },
@@ -240,7 +236,7 @@ const TRANSLATION_SCHEMA = {
             title_en: { type: "string" },
             dek_en: { type: "string" }
           },
-          required: ["url","title_en"]
+          required: ["url","title_en","dek_en"]
         }
       }
     },
@@ -261,7 +257,7 @@ const SUMMARY_SCHEMA = {
       watchlist: { type: "array", items: { type: "string" } },
       notable_quotes: { type: "array", items: { type: "string" } }
     },
-    required: ["executive_summary"]
+    required: ["executive_summary","key_themes","cross_outlet_contrasts","watchlist","notable_quotes"]
   },
   strict: true
 };
