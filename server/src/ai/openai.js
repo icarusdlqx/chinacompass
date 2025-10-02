@@ -208,7 +208,7 @@ const CLASSIFICATION_SCHEMA = {
           type: "object",
           additionalProperties: false,
           properties: {
-            url: { type: "string", format: "uri" },
+            url: { type: "string" },
             category: {
               type: "string",
               enum: ["international","domestic_politics","business","society","technology","military","science","opinion"]
@@ -236,7 +236,7 @@ const TRANSLATION_SCHEMA = {
           type: "object",
           additionalProperties: false,
           properties: {
-            url: { type: "string", format: "uri" },
+            url: { type: "string" },
             title_en: { type: "string" },
             dek_en: { type: "string" }
           },
