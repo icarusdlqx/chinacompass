@@ -109,7 +109,7 @@ export async function runFullScan({ manual=false } = {}) {
       let lastError = null;
       for (const feed of (src.feeds || [])) {
         try {
-          const feedItems = await fetchFeed(feed.url);
+          const feedItems = (await fetchFeed(feed.url)).slice(0, 100);
           totalForSource += feedItems.length;
           for (const it of feedItems) {
             const url = it.link || it.guid || "";
