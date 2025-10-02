@@ -1,4 +1,4 @@
-type Summary = {
+export type Summary = {
   executive_summary: string
   key_themes?: string[]
   cross_outlet_contrasts?: string[]

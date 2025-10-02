@@ -1,7 +1,17 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import Header from '../components/Header'
+import { formatDateTime } from '../components/scan/ScanSections'
+import { formatDuration } from '../utils/time'
+import { humanizeIdentifier } from '../utils/text'
 
-type ScanMeta = { id: string, run_started_at: string, run_completed_at: string, total_articles: number, schedule_kind: string }
+type ScanMeta = {
+  id: string
+  run_started_at: string
+  run_completed_at: string | null
+  total_articles: number
+  schedule_kind: string
+}
 
 export default function Log() {
   const [items, setItems] = useState<ScanMeta[]>([])
@@ -15,30 +25,74 @@ export default function Log() {
   useEffect(() => { load() }, [])
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-slate-50">
       <Header onRescan={() => {}} />
-      <main className="max-w-4xl mx-auto p-4">
-        <h2 className="text-lg font-semibold mb-3">Daily Log</h2>
-        <table className="min-w-full border text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="text-left p-2 border-r">Date (start)</th>
-              <th className="text-left p-2 border-r">Completed</th>
-              <th className="text-left p-2 border-r">Articles</th>
-              <th className="text-left p-2">Kind</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map(it => (
-              <tr key={it.id} className="odd:bg-white even:bg-gray-50">
-                <td className="p-2 border-r"><a className="underline" href={`/api/scans/${it.id}`} target="_blank" rel="noreferrer">{new Date(it.run_started_at).toLocaleString()}</a></td>
-                <td className="p-2 border-r">{it.run_completed_at ? new Date(it.run_completed_at).toLocaleString() : '—'}</td>
-                <td className="p-2 border-r">{it.total_articles}</td>
-                <td className="p-2">{it.schedule_kind}</td>
+      <main className="mx-auto max-w-5xl px-4 pb-10">
+        <h2 className="mb-4 mt-6 text-lg font-semibold text-slate-900">Daily Log</h2>
+        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <table className="min-w-full divide-y divide-slate-200 text-sm">
+            <thead className="bg-slate-50/70 text-xs uppercase tracking-wide text-slate-500">
+              <tr>
+                <th scope="col" className="px-4 py-3 text-left">Run</th>
+                <th scope="col" className="px-4 py-3 text-left">Status</th>
+                <th scope="col" className="px-4 py-3 text-left">Articles</th>
+                <th scope="col" className="px-4 py-3 text-left">Schedule</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-200 bg-white">
+              {items.map((it) => {
+                const startedAt = formatDateTime(it.run_started_at)
+                const completedAt = formatDateTime(it.run_completed_at)
+                const isComplete = Boolean(it.run_completed_at)
+                const duration = formatDuration(it.run_started_at, it.run_completed_at)
+                const statusLabel = isComplete ? 'Completed' : 'In progress'
+                const statusClass = isComplete
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : 'bg-amber-100 text-amber-700'
+
+                return (
+                  <tr key={it.id} className="hover:bg-slate-50">
+                    <td className="px-4 py-4 align-top">
+                      <div className="flex flex-col gap-1">
+                        <Link
+                          to={`/log/${it.id}`}
+                          className="font-medium text-slate-900 hover:text-slate-700 hover:underline"
+                        >
+                          {startedAt}
+                        </Link>
+                        <span className="text-xs text-slate-500">Scan ID: {it.id}</span>
+                        {completedAt !== '—' && (
+                          <span className="text-xs text-slate-500">Completed {completedAt}</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 align-top">
+                      <div className="flex flex-col gap-1">
+                        <span
+                          className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-medium ${statusClass}`}
+                        >
+                          {statusLabel}
+                        </span>
+                        {duration !== '—' && (
+                          <span className="text-xs text-slate-500">Elapsed {duration}</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 align-top font-medium text-slate-900">{it.total_articles}</td>
+                    <td className="px-4 py-4 align-top">
+                      <div className="flex flex-col gap-1 text-xs">
+                        <span className="font-medium text-slate-700">
+                          {humanizeIdentifier(it.schedule_kind) || '—'}
+                        </span>
+                        <span className="text-slate-500">View details &rarr;</span>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
       </main>
     </div>
   )

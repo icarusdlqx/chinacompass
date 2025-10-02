@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 
-type Item = {
+export type CategoryItem = {
   url: string
   source_name: string
   title_zh: string
@@ -8,7 +8,7 @@ type Item = {
   published_at?: string
 }
 
-export default function CategoryColumn({ title, items }: { title: string, items: Item[] }) {
+export default function CategoryColumn({ title, items }: { title: string, items: CategoryItem[] }) {
   const [showEnglish, setShowEnglish] = useState(false)
   const hasTranslations = useMemo(() => items.some(it => !!it.title_en), [items])
 
