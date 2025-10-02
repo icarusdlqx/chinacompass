@@ -7,7 +7,8 @@
     "dev": "node --env-file=.env src/index.js",
     "start": "node src/index.js",
     "scan": "node --env-file=.env src/jobs/run-scan.js",
-    "build": "echo \"No server build step\""
+    "build": "echo \"No server build step\"",
+    "test": "node --test"
   },
   "dependencies": {
     "cors": "^2.8.5",

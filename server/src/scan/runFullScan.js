@@ -6,13 +6,21 @@ import { config } from "../util/config.js";
 import { getAllSources, getEnabledSources } from "../feeds/registry.js";
 import { fetchFeed } from "../feeds/fetchFeeds.js";
 import { articleIdFrom, normalizeTitle, groupBy } from "./helpers.js";
-import { classifyItems, translateItems, summarizeCategory, hashStable } from "../ai/openai.js";
+import { classifyItemsBatched, translateItemsBatched, summarizeCategory, hashStable } from "../ai/openai.js";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const OPENAI_SOURCE_ID = "__openai__";
 const MAX_ERROR_LENGTH = 500;
+const MAX_TITLE_CHARS = 512;
+const MAX_DEK_CHARS = 1200;
+
+function truncateField(value, maxLength) {
+  if (!value) return "";
+  const str = typeof value === "string" ? value : String(value);
+  return str.length > maxLength ? str.slice(0, maxLength) : str;
+}
 
 function truncateError(err) {
   if (!err) return null;
@@ -110,8 +118,8 @@ export async function runFullScan({ manual=false } = {}) {
               source_id: src.id,
               source_name: src.name,
               url,
-              title_zh: normalizeTitle(it.title || ""),
-              dek_zh: normalizeTitle(it.contentSnippet || it.content || ""),
+              title_zh: truncateField(normalizeTitle(it.title || ""), MAX_TITLE_CHARS),
+              dek_zh: truncateField(normalizeTitle(it.contentSnippet || it.content || ""), MAX_DEK_CHARS),
               published_at: it.isoDate || it.pubDate || null,
               fetched_at: startedAt,
               section_hint: feed.section_hint || "mixed"
@@ -176,7 +184,7 @@ export async function runFullScan({ manual=false } = {}) {
         classificationPhase = 'running';
         lastOpenAIError = null;
         setOpenAIStatus({ classification_status: 'running', openai_error: null });
-        const classification = await classifyItems(config.OPENAI_MODEL, items);
+        const classification = await classifyItemsBatched(config.OPENAI_MODEL, items);
         classificationPhase = 'success';
         setOpenAIStatus({ classification_status: 'success', openai_connected: 1 });
         const catByUrl = new Map();
@@ -202,7 +210,7 @@ export async function runFullScan({ manual=false } = {}) {
         translationPhase = 'running';
         lastOpenAIError = null;
         setOpenAIStatus({ translation_status: 'running', openai_error: null });
-        translations = await translateItems(config.OPENAI_MODEL, items);
+        translations = await translateItemsBatched(config.OPENAI_MODEL, items);
         translationPhase = 'success';
         setOpenAIStatus({ translation_status: 'success', openai_connected: 1 });
       } catch (err) {

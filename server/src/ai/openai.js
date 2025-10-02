@@ -16,6 +16,14 @@ function getOpenAI() {
 
 export const openai = getOpenAI();
 
+export const MAX_CLASSIFICATION_BATCH_SIZE = 20;
+export const DEFAULT_CLASSIFICATION_BATCH_SIZE = 12;
+export const MAX_TRANSLATION_BATCH_SIZE = 12;
+export const DEFAULT_TRANSLATION_BATCH_SIZE = 8;
+const MAX_TITLE_LENGTH = 512;
+const MAX_DEK_LENGTH = 1200;
+const MAX_SECTION_HINT_LENGTH = 128;
+
 const JSON_SCHEMA_CAPABLE_MODELS = [
   "gpt-4.1",
   "gpt-4.1-mini",
@@ -133,6 +141,28 @@ function validateAgainstSchema(schemaDef, data) {
     default:
       return data;
   }
+}
+
+function limitString(value, maxLength) {
+  if (!value) {
+    return "";
+  }
+  const str = typeof value === "string" ? value : String(value);
+  return str.length > maxLength ? str.slice(0, maxLength) : str;
+}
+
+function clampBatchSize(requestedSize, fallbackSize, maxSize) {
+  const fallback = Number.isInteger(fallbackSize) && fallbackSize > 0 ? fallbackSize : 1;
+  const candidate = Number.isInteger(requestedSize) && requestedSize > 0 ? requestedSize : fallback;
+  return Math.max(1, Math.min(candidate, maxSize));
+}
+
+function chunkArray(items, size) {
+  const chunks = [];
+  for (let i = 0; i < items.length; i += size) {
+    chunks.push(items.slice(i, i + size));
+  }
+  return chunks;
 }
 
 function extractJsonFromText(text) {
@@ -263,10 +293,20 @@ const SUMMARY_SCHEMA = {
 };
 
 export async function classifyItems(model, items) {
+  if (!Array.isArray(items)) {
+    throw new Error("[openai] classifyItems expects an array of items.");
+  }
+  if (items.length > MAX_CLASSIFICATION_BATCH_SIZE) {
+    throw new Error(`[openai] classifyItems received ${items.length} items; max allowed per batch is ${MAX_CLASSIFICATION_BATCH_SIZE}.`);
+  }
   const input = {
     task: "Classify Chinese news items into exactly one category.",
     categories: ["international","domestic_politics","business","society","technology","military","science","opinion"],
-    items: items.map(i => ({ url: i.url, title_zh: i.title_zh, section_hint: i.section_hint || "" }))
+    items: items.map(i => ({
+      url: i.url,
+      title_zh: limitString(i.title_zh, MAX_TITLE_LENGTH),
+      section_hint: limitString(i.section_hint || "", MAX_SECTION_HINT_LENGTH)
+    }))
   };
   const prompt = `Respond strictly in JSON matching the schema.\n\n${JSON.stringify(input)}`;
   return requestStructuredCompletion({
@@ -279,9 +319,19 @@ export async function classifyItems(model, items) {
 }
 
 export async function translateItems(model, items) {
+  if (!Array.isArray(items)) {
+    throw new Error("[openai] translateItems expects an array of items.");
+  }
+  if (items.length > MAX_TRANSLATION_BATCH_SIZE) {
+    throw new Error(`[openai] translateItems received ${items.length} items; max allowed per batch is ${MAX_TRANSLATION_BATCH_SIZE}.`);
+  }
   const input = {
     task: "Translate the Chinese headlines to English concisely. Preserve named entities, institutions, policy terms; do not anglicize official names (e.g., keep 'NDRC', 'CCP', 'PLA'). Provide plain text. If a subtitle/dek is present, translate it too.",
-    items: items.map(i => ({ url: i.url, title_zh: i.title_zh }))
+    items: items.map(i => ({
+      url: i.url,
+      title_zh: limitString(i.title_zh, MAX_TITLE_LENGTH),
+      dek_zh: limitString(i.dek_zh || "", MAX_DEK_LENGTH)
+    }))
   };
   const prompt = `Respond strictly in JSON matching the schema.\n\n${JSON.stringify(input)}`;
   return requestStructuredCompletion({
@@ -291,6 +341,64 @@ export async function translateItems(model, items) {
     ],
     schemaDef: TRANSLATION_SCHEMA
   });
+}
+
+function buildOrderedResults(items, rows) {
+  const expectedOrder = items.map(it => it.url);
+  const byUrl = new Map();
+  for (const row of rows || []) {
+    if (row && row.url) {
+      byUrl.set(row.url, row);
+    }
+  }
+  const ordered = [];
+  const missing = [];
+  for (const url of expectedOrder) {
+    const row = byUrl.get(url);
+    if (row) {
+      ordered.push(row);
+    } else {
+      missing.push(url);
+    }
+  }
+  if (missing.length) {
+    console.warn(`[openai] Missing results for ${missing.length} items: ${missing.slice(0, 5).join(", ")}...`);
+  }
+  return ordered;
+}
+
+export async function classifyItemsBatched(model, items, { batchSize, singleBatchFn } = {}) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return { items: [] };
+  }
+  const maxSize = MAX_CLASSIFICATION_BATCH_SIZE;
+  const safeSize = clampBatchSize(batchSize, DEFAULT_CLASSIFICATION_BATCH_SIZE, maxSize);
+  const handler = typeof singleBatchFn === "function" ? singleBatchFn : classifyItems;
+  const merged = [];
+  for (const chunk of chunkArray(items, safeSize)) {
+    const result = await handler(model, chunk);
+    if (result?.items) {
+      merged.push(...result.items);
+    }
+  }
+  return { items: buildOrderedResults(items, merged) };
+}
+
+export async function translateItemsBatched(model, items, { batchSize, singleBatchFn } = {}) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return { translations: [] };
+  }
+  const maxSize = MAX_TRANSLATION_BATCH_SIZE;
+  const safeSize = clampBatchSize(batchSize, DEFAULT_TRANSLATION_BATCH_SIZE, maxSize);
+  const handler = typeof singleBatchFn === "function" ? singleBatchFn : translateItems;
+  const merged = [];
+  for (const chunk of chunkArray(items, safeSize)) {
+    const result = await handler(model, chunk);
+    if (result?.translations) {
+      merged.push(...result.translations);
+    }
+  }
+  return { translations: buildOrderedResults(items, merged) };
 }
 
 export async function summarizeCategory(model, dateISO, category, items) {
