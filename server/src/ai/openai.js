@@ -200,11 +200,13 @@ const CLASSIFICATION_SCHEMA = {
   name: "classification_schema",
   schema: {
     type: "object",
+    additionalProperties: false,
     properties: {
       items: {
         type: "array",
         items: {
           type: "object",
+          additionalProperties: false,
           properties: {
             url: { type: "string", format: "uri" },
             category: {
@@ -226,11 +228,13 @@ const TRANSLATION_SCHEMA = {
   name: "translation_schema",
   schema: {
     type: "object",
+    additionalProperties: false,
     properties: {
       translations: {
         type: "array",
         items: {
           type: "object",
+          additionalProperties: false,
           properties: {
             url: { type: "string", format: "uri" },
             title_en: { type: "string" },
@@ -249,6 +253,7 @@ const SUMMARY_SCHEMA = {
   name: "summary_schema",
   schema: {
     type: "object",
+    additionalProperties: false,
     properties: {
       executive_summary: { type: "string" },
       key_themes: { type: "array", items: { type: "string" } },
