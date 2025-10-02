@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import { config } from "./util/config.js";
 import { db } from "./util/db.js";
 import { runFullScan } from "./scan/runFullScan.js";
-import { getLatestScan, getScanById, listScans } from "./scan/queries.js";
+import { getLatestScan, getLatestScanStatus, getScanById, listScans } from "./scan/queries.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -33,6 +33,12 @@ app.get("/api/today", async (_req, res) => {
   const scan = getLatestScan();
   if (!scan) return res.status(404).json({ error: "No scans yet" });
   res.json(scan);
+});
+
+app.get("/api/status", async (_req, res) => {
+  const status = getLatestScanStatus();
+  if (!status) return res.status(404).json({ error: "No scans yet" });
+  res.json(status);
 });
 
 app.get("/api/scans", async (req, res) => {
