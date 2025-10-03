@@ -30,6 +30,7 @@ export default function Log() {
   const [details, setDetails] = useState<Record<string, ScanDetail>>({})
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [detailError, setDetailError] = useState<string | null>(null)
+  const [retryToken, setRetryToken] = useState(0)
 
   const orderedItems = useMemo(() => items.slice().sort((a, b) => {
     return new Date(b.run_started_at).getTime() - new Date(a.run_started_at).getTime()
@@ -77,11 +78,29 @@ export default function Log() {
     loadDetail(selectedId)
 
     return () => { cancelled = true }
-  }, [selectedId, details])
+  }, [selectedId, details, retryToken])
 
   function selectRun(id: string) {
+    const hasDetail = !!details[id]
+    const isSameSelection = id === selectedId
+    const shouldReload = isSameSelection ? detailError !== null || !hasDetail : !hasDetail
+
     setDetailError(null)
-    setSelectedId(id)
+    if (shouldReload) {
+      setLoadingId(id)
+    } else {
+      setLoadingId(null)
+    }
+
+    setSelectedId(current => {
+      if (current === id) {
+        if (shouldReload) {
+          setRetryToken(token => token + 1)
+        }
+        return current
+      }
+      return id
+    })
   }
 
   const selectedDetail = selectedId ? details[selectedId] : null
