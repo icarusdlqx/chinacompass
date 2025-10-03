@@ -18,7 +18,8 @@ const CAT_LABELS: Record<string,string> = {
   technology: "Technology",
   military: "Military/Defense",
   science: "Science/Research",
-  opinion: "Opinion/Commentary"
+  opinion: "Opinion/Commentary",
+  uncategorized: "Uncategorized"
 }
 
 export default function Today() {
