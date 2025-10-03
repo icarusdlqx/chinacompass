@@ -72,7 +72,8 @@ app.use("/api", (_req, res) => {
 });
 
 const port = Number(process.env.PORT || 8000);
-app.listen(port, "localhost", () => {
-  console.log(`[server] listening on http://localhost:${port}`);
+const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
+app.listen(port, host, () => {
+  console.log(`[server] listening on http://${host}:${port}`);
   db.pragma("journal_mode = WAL");
 });
