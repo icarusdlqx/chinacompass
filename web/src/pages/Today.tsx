@@ -3,23 +3,12 @@ import Header from '../components/Header'
 import CategoryColumn, { type CategoryItem } from '../components/CategoryColumn'
 import SummaryCard from '../components/SummaryCard'
 import StatusBar from '../components/StatusBar'
+import { CATEGORY_LABELS, CATEGORY_ORDER } from '../components/categoryLabels'
 
 type ScanPayload = {
   meta: { id: string, run_started_at: string }
   categories: Record<string, CategoryItem[]>
   summaries: Record<string, any>
-}
-
-const CAT_LABELS: Record<string,string> = {
-  international: "International",
-  domestic_politics: "Domestic Politics",
-  business: "Business/Economy",
-  society: "Society",
-  technology: "Technology",
-  military: "Military/Defense",
-  science: "Science/Research",
-  opinion: "Opinion/Commentary",
-  uncategorized: "Uncategorized"
 }
 
 export default function Today() {
@@ -48,7 +37,7 @@ export default function Today() {
     else { alert('Failed: ' + (await r.text())) }
   }
 
-  const order = useMemo(() => Object.keys(CAT_LABELS), [])
+  const order = useMemo(() => CATEGORY_ORDER, [])
   const briefingMeta = useMemo(() => {
     if (!data) return null
     const totalArticles = order.reduce((sum, key) => sum + (data.categories[key]?.length || 0), 0)
@@ -96,7 +85,7 @@ export default function Today() {
               </div>
               <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {order.map(c => (
-                  <CategoryColumn key={c} title={CAT_LABELS[c]} items={data.categories[c] || []} />
+                  <CategoryColumn key={c} title={CATEGORY_LABELS[c]} items={data.categories[c] || []} />
                 ))}
               </div>
             </section>
@@ -107,7 +96,7 @@ export default function Today() {
               </div>
               <div className="grid gap-6 md:grid-cols-2">
                 {order.map(c => (
-                  <SummaryCard key={c} title={CAT_LABELS[c]} data={data.summaries[c]} />
+                  <SummaryCard key={c} title={CATEGORY_LABELS[c]} data={data.summaries[c]} />
                 ))}
               </div>
             </section>
