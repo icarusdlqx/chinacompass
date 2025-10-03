@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import Header from '../components/Header'
-import CategoryColumn from '../components/CategoryColumn'
+import CategoryColumn, { type CategoryItem } from '../components/CategoryColumn'
 import SummaryCard from '../components/SummaryCard'
 import StatusBar from '../components/StatusBar'
 
 type ScanPayload = {
   meta: { id: string, run_started_at: string }
-  categories: Record<string, any[]>
+  categories: Record<string, CategoryItem[]>
   summaries: Record<string, any>
 }
 

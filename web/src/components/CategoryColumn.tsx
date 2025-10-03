@@ -1,16 +1,26 @@
 import { useMemo, useState } from 'react'
 
-type Item = {
+export type CategoryItem = {
+  id: string
   url: string
   source_name: string
   title_zh: string
   title_en?: string
+  dek_zh?: string
+  dek_en?: string
   published_at?: string
+  source_id?: string
+  fetched_at?: string
+  section_hint?: string
+  hash?: string
+  category?: string
+  rank_in_category?: number
+  is_duplicate?: boolean
 }
 
-export default function CategoryColumn({ title, items }: { title: string, items: Item[] }) {
+export default function CategoryColumn({ title, items }: { title: string, items: CategoryItem[] }) {
   const [showEnglish, setShowEnglish] = useState(false)
-  const hasTranslations = useMemo(() => items.some(it => !!it.title_en), [items])
+  const hasTranslations = useMemo(() => items.some(it => !!(it.title_en || it.dek_en)), [items])
 
   function formatTime(value?: string) {
     if (!value) return null
@@ -45,6 +55,7 @@ export default function CategoryColumn({ title, items }: { title: string, items:
         )}
         {items.map((it, idx) => {
           const time = formatTime(it.published_at)
+          const englishText = it.title_en || it.dek_en
           return (
             <li key={it.url + idx} className="group">
               <a
@@ -62,8 +73,8 @@ export default function CategoryColumn({ title, items }: { title: string, items:
                 <p className="mt-2 text-sm font-medium leading-snug text-slate-900 group-hover:text-slate-950">
                   {it.title_zh}
                 </p>
-                {showEnglish && it.title_en && (
-                  <p className="mt-1 text-sm leading-relaxed text-slate-600">{it.title_en}</p>
+                {showEnglish && englishText && (
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">{englishText}</p>
                 )}
               </a>
             </li>
