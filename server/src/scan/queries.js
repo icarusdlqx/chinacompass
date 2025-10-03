@@ -14,10 +14,11 @@ export function getScanById(id) {
   const scan = db.prepare("SELECT * FROM scans WHERE id = ?").get(id);
   if (!scan) return null;
   const items = db.prepare(`
-    SELECT a.*, s.name as source_name, si.category, si.rank_in_category, si.is_duplicate
+    SELECT a.*, s.name as source_name, si.category, si.rank_in_category, si.is_duplicate, t.title_en, t.dek_en
     FROM scan_items si
     JOIN articles a ON a.id = si.article_id
     JOIN sources s ON s.id = a.source_id
+    LEFT JOIN translations t ON t.article_id = a.id
     WHERE si.scan_id = ?
     ORDER BY si.category, si.rank_in_category, a.published_at DESC, a.fetched_at DESC
   `).all(id);
@@ -41,9 +42,29 @@ function groupByCategory(items) {
   for (const it of items) {
     const cat = it.category || "uncategorized";
     if (!map[cat]) map[cat] = [];
-    map[cat].push(it);
+    map[cat].push(serializeItem(it));
   }
   return map;
+}
+
+function serializeItem(item) {
+  return {
+    id: item.id,
+    source_id: item.source_id,
+    source_name: item.source_name,
+    url: item.url,
+    title_zh: item.title_zh,
+    dek_zh: item.dek_zh,
+    title_en: item.title_en,
+    dek_en: item.dek_en,
+    published_at: item.published_at,
+    fetched_at: item.fetched_at,
+    section_hint: item.section_hint,
+    hash: item.hash,
+    category: item.category,
+    rank_in_category: item.rank_in_category,
+    is_duplicate: !!item.is_duplicate,
+  };
 }
 
 export function getLatestScanStatus() {
